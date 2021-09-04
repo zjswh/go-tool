@@ -84,7 +84,6 @@ func StructToMap(data interface{}) map[string]interface{} {
 	return dataMap
 }
 
-
 func Reverse(s string) string {
 	a := []rune(s)
 	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
