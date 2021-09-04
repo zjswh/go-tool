@@ -4,12 +4,33 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 const MessageHost = "http://pubdev.guangdianyun.tv"
+
+func DefaultIntParam(str string, defaultValue int, c *gin.Context) int {
+	param := c.Query(str)
+	if param == "" {
+		return defaultValue
+	}
+	intParam, _ := strconv.Atoi(param)
+	return intParam
+}
+
+func DefaultIntFormValue(str string, defaultValue int, c *gin.Context) int {
+	param := c.Request.FormValue(str)
+	if param == "" {
+		return defaultValue
+	}
+	intParam, _ := strconv.Atoi(param)
+	return intParam
+}
 
 func Request(url string, data map[string]interface{}, header map[string]interface{}, method string, stype string) (body []byte, err error) {
 	url = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(url, "\n", ""), " ", ""), "\r", "")
@@ -90,4 +111,9 @@ func Reverse(s string) string {
 		a[i], a[j] = a[j], a[i]
 	}
 	return string(a)
+}
+
+func GenUUID() string {
+	u, _ := uuid.NewRandom()
+	return u.String()
 }
