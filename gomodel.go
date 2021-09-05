@@ -108,6 +108,7 @@ func checkFileIsExist(filename string) bool {
 	return true
 }
 
+
 func Request(url string, data map[string]interface{}, header map[string]interface{}, method string, stype string) (body []byte, err error) {
 	url = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(url, "\n", ""), " ", ""), "\r", "")
 	param := []byte("")
