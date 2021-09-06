@@ -7,9 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const MessageHost = "http://pubdev.guangdianyun.tv"
@@ -116,4 +118,32 @@ func Reverse(s string) string {
 func GenUUID() string {
 	u, _ := uuid.NewRandom()
 	return u.String()
+}
+
+func RandomCoupon() string {
+	// 48 ~ 57 数字
+	// 65 ~ 90 A ~ Z
+	// 97 ~ 122 a ~ z
+	// 一共62个字符，在0~61进行随机，小于10时，在数字范围随机，
+	// 小于36在大写范围内随机，其他在小写范围随机
+	var length = 16 // 2个-
+	rand.Seed(time.Now().UnixNano())
+
+	result := make([]string, 0, length)
+	for i := 0; i < length; i++ {
+		if i > 0 && i%4 == 0 {
+			result = append(result, "-")
+		}
+		t := rand.Intn(62)
+		if t < 10 {
+			result = append(result, strconv.Itoa(rand.Intn(10)))
+		} else if t < 36 {
+			// result = append(result, string(rand.Intn(26)+65))
+			result = append(result, string(rune(rand.Intn(26)+65)))
+		} else {
+			// result = append(result, string(rand.Intn(26)+97))
+			result = append(result, string(rune(rand.Intn(26)+97)))
+		}
+	}
+	return strings.ToUpper(strings.Join(result, ""))
 }
