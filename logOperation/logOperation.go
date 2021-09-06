@@ -7,23 +7,15 @@ import (
 	"time"
 )
 
-var ApiMap = map[string][]string{
-	"/v1/coupon/market/Discount/create":         []string{"创建优惠券", "活动管理-优惠券"},
-	"/v1/coupon/market/Discount/update":         []string{"修改优惠券", "活动管理-优惠券"},
-	"/v1/coupon/market/Discount/delete":         []string{"删除优惠券", "活动管理-优惠券"},
-	"/v1/coupon/market/Discount/saveInclude":    []string{"配置优惠券", "活动管理-优惠券"},
-	"/v1/coupon/market/DiscountDetail/writeOff": []string{"核销优惠券", "活动管理-优惠券"},
-}
-
 const LogPushUrl = "http://consoleapi.guangdianyun.tv/v1/log/operation"
 
-func Push(c *gin.Context,XCaStage string, data interface{})  {
+func Push(c *gin.Context, XCaStage string, apiMap map[string][]string, data interface{})  {
 	path := c.Request.URL.Path
 	method := c.Request.Method
 	token := c.Request.Header.Get("token")
 	ip := c.ClientIP()
 
-	if _, ok := ApiMap[path]; !ok {
+	if _, ok := apiMap[path]; !ok {
 		return
 	}
 
@@ -36,8 +28,8 @@ func Push(c *gin.Context,XCaStage string, data interface{})  {
 	req, _ := json.Marshal(reqMap)
 	param := map[string]interface{} {
 		"token" : token,
-		"operate": ApiMap[path][0],
-		"module": ApiMap[path][1],
+		"operate": apiMap[path][0],
+		"module": apiMap[path][1],
 		"path": path,
 		"method": method,
 		"req": string(req),
