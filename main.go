@@ -43,7 +43,7 @@ func getCurrentPath() string {
 }
 
 func template() {
-	CopyDir(getCurrentPath() +  "template", *targetAddr, *name)
+	CopyDir(getCurrentPath() +  "example", *targetAddr, *name)
 	fmt.Println("项目创建成功")
 }
 
