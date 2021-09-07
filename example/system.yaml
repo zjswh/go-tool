@@ -1,0 +1,7 @@
+nacosIp: "47.110.242.138"
+nacosPort: 8848
+appIp: "47.110.242.138"
+appPort: 30034
+serverName: TEMPLATE
+mode: "debug"
+configId: "gdy"
