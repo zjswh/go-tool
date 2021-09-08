@@ -19,7 +19,6 @@ var (
 	GVA_VP            *viper.Viper
 	GVA_DB            *gorm.DB
 	GVA_REDIS         *redis.Client
-	GVA_REDIS_MASTER  *redis.Client
 )
 
 type UserInfo struct {

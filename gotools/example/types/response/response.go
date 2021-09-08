@@ -15,23 +15,6 @@ type Response struct {
 	ErrorCode    int         `json:"errorCode"`
 }
 
-type GdyAPiResult struct {
-	Code         int                   `json:"code"`
-	ErrorCode    int                   `json:"errorCode"`
-	ErrorMessage string                `json:"errorMessage"`
-	Data         map[string][]LiveList `json:"data"`
-}
-
-type LiveList struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	Logo       string `json:"logo"`
-	CreateTime string `json:"createTime"`
-	Type       string `json:"type"`
-	WatchNum   int    `json:"watchNum"`
-	IsSelect   int    `json:"isSelect"`
-}
-
 func Success(data interface{}, c *gin.Context) {
 	Result(0, data, "", c)
 }

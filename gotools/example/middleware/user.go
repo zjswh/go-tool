@@ -1,8 +1,7 @@
-package service
+package middleware
 
 import (
 	"TEMPLATE/config"
-	"TEMPLATE/middleware"
 	"TEMPLATE/types/response"
 	"encoding/json"
 	"fmt"
@@ -40,7 +39,7 @@ func CheckLogin() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		realToken := middleware.JwtAuth(token)
+		realToken := JwtAuth(token)
 		if realToken == "" {
 			response.Result(1, "", "登录过期", c)
 			c.Abort()
@@ -72,7 +71,7 @@ func GetCUserInfo(c *gin.Context) CUserInfo {
 		return userInfo
 	}
 
- 	realToken := middleware.JwtAuth(token)
+ 	realToken := JwtAuth(token)
 	if realToken == "" {
 		return userInfo
 	}

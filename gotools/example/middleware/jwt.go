@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"TEMPLATE/config"
-	"TEMPLATE/types/request"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"TEMPLATE/config"
+	"TEMPLATE/types/appConst"
 )
 
 type JWT struct {
@@ -34,14 +34,14 @@ func JwtAuth(token string) string {
 	return  claims.Token
 }
 
-func CreateToken(claims request.UserClaims) (string, error) {
+func CreateToken(claims appConst.UserClaims) (string, error) {
 	newJwt := NewJwt()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(newJwt.SigningKey)
 }
 
-func (j *JWT) ParseToken(tokenString string) (*request.UserClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &request.UserClaims{}, func(token *jwt.Token) (i interface{}, err error) {
+func (j *JWT) ParseToken(tokenString string) (*appConst.UserClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &appConst.UserClaims{}, func(token *jwt.Token) (i interface{}, err error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
@@ -60,7 +60,7 @@ func (j *JWT) ParseToken(tokenString string) (*request.UserClaims, error) {
 	}
 
 	if token != nil {
-		if claims, ok := token.Claims.(*request.UserClaims); ok && token.Valid {
+		if claims, ok := token.Claims.(*appConst.UserClaims); ok && token.Valid {
 			return claims, nil
 		}
 		return nil, TokenInvalid

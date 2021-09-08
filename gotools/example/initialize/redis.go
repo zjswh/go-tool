@@ -21,19 +21,4 @@ func Redis() {
 		fmt.Println("redis connect result is:", pong)
 		config.GVA_REDIS = client
 	}
-
-	confMaster := config.GVA_CONFIG.RedisMaster
-	fmt.Println("redisMaster")
-	clientMaster := redis.NewClient(&redis.Options{
-		Addr: confMaster.Addr,
-		Password: confMaster.Password,
-		DB: confMaster.DB,
-	})
-	pongMaster, err := clientMaster.Ping().Result()
-	if err != nil {
-		fmt.Println("redis连接失败")
-	} else{
-		fmt.Println("redis connect result is:", pongMaster)
-		config.GVA_REDIS_MASTER = clientMaster
-	}
 }

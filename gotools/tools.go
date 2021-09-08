@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
+	"github.com/logrusorgru/aurora"
+	"github.com/tal-tech/go-zero/tools/goctl/api/parser"
+	"github.com/urfave/cli"
+	"github.com/zjswh/go-tool/gotools/gen"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,20 +19,58 @@ import (
 	"strings"
 )
 
-var sqlAddr = flag.String("sql", "", "sql file path")
-var action = flag.String("a", "", "action")
-var name = flag.String("name", "", "project name")
-var targetAddr = flag.String("dir", "", "code produced path")
+var (
+	commands     = []cli.Command{
+		{
+			Name:   "template",
+			Usage:  "generate api related files",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "api",
+					Usage: "the api file",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:  "name",
+					Usage: "the project name",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:  "dir",
+					Usage: "the dest path",
+					Required: true,
+				},
+			},
+			Action: template,
+		},
+		{
+			Name:   "model",
+			Usage:  "generate mysql model files",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "sql",
+					Usage: "the sql file",
+					Required: true,
+				},
+				cli.StringFlag{
+					Name:  "dir",
+					Usage: "the dest path",
+					Required: true,
+				},
+			},
+			Action: model,
+		},
+	}
+)
 
 func main() {
-	flag.Parse()
-	switch *action {
-	case "model":
-		model()
-	case "template":
-		template()
-	default:
-		fmt.Println("action miss")
+	app := cli.NewApp()
+	app.Usage = "a cli tool to generate code"
+	app.Version = fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
+	app.Commands = commands
+	// cli already print error messages
+	if err := app.Run(os.Args); err != nil {
+		fmt.Println(aurora.Red("error: " + err.Error()))
 	}
 }
 
@@ -42,32 +83,69 @@ func getCurrentPath() string {
 	return abPath + "/"
 }
 
-func template() {
-	CopyDir(getCurrentPath() +  "example", *targetAddr, *name)
-	fmt.Println("项目创建成功")
+func template(c *cli.Context) {
+	apiPath := c.String("api")
+	name := c.String("name")
+	targetAddr := c.String("dir")
+
+	//根据api文件生成对应基础代码
+	CopyDir(getCurrentPath() +  "example", targetAddr, name)
+
+	err := ApiCommand(apiPath, name, targetAddr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
-func model() {
-	if *sqlAddr == "" || !checkFileIsExist(*sqlAddr) {
+func ApiCommand (apiFile, projectName, destPath string) error {
+	api, err := parser.Parse(apiFile)
+	if err != nil {
+		return err
+	}
+	err = gen.GenRoutes(api, projectName, destPath)
+	if err != nil {
+		return err
+	}
+	err = gen.GenApi(api, projectName, destPath)
+	if err != nil {
+		return err
+	}
+	err = gen.GenTypes(api, destPath)
+	if err != nil {
+		return err
+	}
+	err = gen.GenService(api, projectName, destPath)
+	if err != nil {
+		return err
+	}
+	fmt.Println(aurora.Green("Done."))
+	return nil
+}
+
+func model(c *cli.Context) {
+	sqlAddr := c.String("sql")
+	targetAddr := c.String("dir")
+	if sqlAddr == "" || !checkFileIsExist(sqlAddr) {
 		fmt.Println("sql路径不存在")
 		return
 	}
 
-	if *targetAddr == "" {
+	if targetAddr == "" {
 		fmt.Println("请输入文件生成地址")
 		return
 	}
 
 	//判断文件生成地址是否存在
-	if b, _ := pathExists(*targetAddr); !b {
-		err := os.Mkdir(*targetAddr, os.ModePerm)
+	if b, _ := pathExists(targetAddr); !b {
+		err := os.Mkdir(targetAddr, os.ModePerm)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 	}
 
-	bt, _ := os.ReadFile(*sqlAddr)
+	bt, _ := os.ReadFile(sqlAddr)
 	arr := strings.Split(string(bt), ";")
 
 	funcTemplateByte, err  := ioutil.ReadFile(getCurrentPath() + "model.tpl")
@@ -79,7 +157,7 @@ func model() {
 	for _, v := range arr {
 		if v != "" && v != "\n" && v != "\r\n" {
 			sqlName := regexpData(v, "CREATE TABLE `(.*?)` ")
-			dir := *targetAddr
+			dir := targetAddr
 			dir = strings.TrimRight(dir, "/")
 			filename := dir + "/" + Case2Camel(sqlName) + ".go"
 			if !checkFileIsExist(filename) { //如果文件存在
@@ -244,7 +322,6 @@ func CopyDir(srcPath, destPath, name string) error {
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
-
 	//生成go.mod文件
 	ioutil.WriteFile("go.mod", []byte(fmt.Sprintf("module %s\n\ngo 1.16\n\n", name)), os.ModePerm)
 	return err
@@ -268,7 +345,6 @@ func copyFile(src, dest, name string) error {
 			destSplitPath = destSplitPath + dir + "/"
 			b, _ := pathExists(destSplitPath)
 			if b == false {
-				fmt.Println("创建目录:" + destSplitPath)
 				//创建目录
 				err := os.Mkdir(destSplitPath, os.ModePerm)
 				if err != nil {

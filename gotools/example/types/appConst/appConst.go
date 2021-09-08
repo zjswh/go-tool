@@ -1,4 +1,4 @@
-package request
+package appConst
 
 import "github.com/dgrijalva/jwt-go"
 
@@ -7,4 +7,6 @@ type UserClaims struct {
 	jwt.StandardClaims
 }
 
+var ApiMap = map[string][]string{
 
+}

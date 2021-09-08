@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"TEMPLATE/config"
+	"TEMPLATE/types/response"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xinliangnote/go-util/mail"
-	"TEMPLATE/config"
-	"TEMPLATE/types/response"
 	"runtime/debug"
 	"strings"
 	"time"
