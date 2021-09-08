@@ -76,7 +76,7 @@ func GetCUserInfo(c *gin.Context) CUserInfo {
 		return userInfo
 	}
 
-	info, _ := config.GVA_REDIS_MASTER.Get(realToken).Result()
+	info, _ := config.GVA_REDIS.Get(realToken).Result()
 	json.Unmarshal([]byte(info), &userInfo)
 	return userInfo
 }
