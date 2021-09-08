@@ -41,7 +41,7 @@ func Routers() *gin.Engine {
 	//日记记录
 	Router.Use(middleware.RequestId(), middleware.LoggerToFile()) //, middleware.Exception()
 
-	ApiGroup := Router.Group("v1/coupon/market")
+	ApiGroup := Router.Group("")
 	router.InitRouter(ApiGroup) //注册用户相关接口路由
 
 	//处理404
