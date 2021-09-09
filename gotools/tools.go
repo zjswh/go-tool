@@ -154,9 +154,10 @@ func model(c *cli.Context) {
 		fmt.Println(err)
 		return
 	}
+
 	for _, v := range arr {
 		if v != "" && v != "\n" && v != "\r\n" {
-			sqlName := regexpData(v, "CREATE TABLE `(.*?)` ")
+			sqlName := regexpData(v, "CREATE TABLE `(.*?)`.*?")
 			dir := targetAddr
 			dir = strings.TrimRight(dir, "/")
 			filename := dir + "/" + Case2Camel(sqlName) + ".go"
