@@ -323,7 +323,7 @@ func CopyDir(srcPath, destPath, name string) error {
 		fmt.Printf(err.Error())
 	}
 	//生成go.mod文件
-	ioutil.WriteFile("go.mod", []byte(fmt.Sprintf("module %s\n\ngo 1.16\n\n", name)), os.ModePerm)
+	ioutil.WriteFile(destPath + "/go.mod", []byte(fmt.Sprintf("module %s\n\ngo 1.16\n\n", name)), os.ModePerm)
 	return err
 }
 

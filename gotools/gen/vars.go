@@ -19,23 +19,23 @@ ROUTER_TEMP
 	apiTemp = `package v1
 
 import (
-	"TEMPLATE/service/couponService"
+	"TEMPLATE/service/SERVICE_NAME"
 	"TEMPLATE/types"
 	"TEMPLATE/types/response"
 	"github.com/gin-gonic/gin"
 )
 FUNC_LIST
 `
-	functionTemplate = `
-func FUNC_NAME(c *gin.Context) {
-	var VAR_STRUCT types.STRUCT_E
+	validTemplate = `	var VAR_STRUCT types.STRUCT_E
 	err := c.ShouldBind(&VAR_STRUCT)
 	if err != nil {
 		response.ParamError("参数缺失", c)
 		return
 	}
-
-	err = couponService.FUNC_NAME(VAR_STRUCT)
+`
+	functionTemplate = `
+func FUNC_NAME(c *gin.Context) {VALID_TEMP
+	err IS_DEFINE= SERVICE_NAME.FUNC_NAME(VAR_STRUCT)
 	if err != nil {
 		response.DbError(err.Error(), c)
 		return
@@ -55,7 +55,7 @@ FUNC_LIST
 `
 
 	serviceFunctionTemplate = `
-func FUNC_NAME(req types.STRUCT_E) (error) {
+func FUNC_NAME(PARAM_TEMP) error {
 	//add your code ...
 	return nil
 }

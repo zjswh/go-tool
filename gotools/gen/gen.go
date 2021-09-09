@@ -21,15 +21,25 @@ func GenApi(api *spec.ApiSpec, projectName, destPath string) error {
 	for _, r := range api.Service.Groups {
 		for _, v := range r.Routes {
 			funcInfo := functionTemplate
-			funcName := path.Base(v.Path)
-			funcInfo = strings.ReplaceAll(funcInfo, "FUNC_NAME", v.Handler)
-			funcInfo = strings.ReplaceAll(funcInfo, "VAR_STRUCT", funcName+"Request")
-			funcInfo = strings.ReplaceAll(funcInfo, "STRUCT_E", v.RequestType.Name())
+			validInfo, varStruct, isDefine := "", "", ":"
+			funcInfo = strings.ReplaceAll(funcInfo, "FUNC_NAME", ucFirst(v.Handler))
+			if v.RequestTypeName() != "" {
+				isDefine = ""
+				validInfo = validTemplate
+				varStruct = path.Base(v.Path) + "Request"
+				validInfo = strings.ReplaceAll(validInfo, "STRUCT_E", ucFirst(v.RequestType.Name()))
+				validInfo = "\n" + validInfo
+			}
+			funcInfo = strings.ReplaceAll(funcInfo, "VALID_TEMP", validInfo)
+			funcInfo = strings.ReplaceAll(funcInfo, "IS_DEFINE", isDefine)
+			funcInfo = strings.ReplaceAll(funcInfo, "VAR_STRUCT", varStruct)
 			apiFunc += funcInfo
 		}
 	}
+
 	apiTemp = strings.ReplaceAll(apiTemp, "FUNC_LIST", apiFunc)
 	apiTemp = strings.ReplaceAll(apiTemp, "TEMPLATE", projectName)
+	apiTemp = strings.ReplaceAll(apiTemp, "SERVICE_NAME", api.Service.Name+"Service")
 	err = ioutil.WriteFile(apiDir+"/"+api.Service.Name+".go", []byte(apiTemp), os.ModePerm)
 	return err
 }
@@ -46,8 +56,12 @@ func GenService(api *spec.ApiSpec, projectName, destPath string) error {
 	for _, r := range api.Service.Groups {
 		for _, v := range r.Routes {
 			funcInfo := serviceFunctionTemplate
-			funcInfo = strings.ReplaceAll(funcInfo, "FUNC_NAME", v.Handler)
-			funcInfo = strings.ReplaceAll(funcInfo, "STRUCT_E", v.RequestType.Name())
+			funcInfo = strings.ReplaceAll(funcInfo, "FUNC_NAME", ucFirst(v.Handler))
+			paramTemplate := ""
+			if v.RequestTypeName() != "" {
+				paramTemplate = "req types." + ucFirst(v.RequestType.Name())
+			}
+			funcInfo = strings.ReplaceAll(funcInfo, "PARAM_TEMP", paramTemplate)
 			serviceFunc += funcInfo
 		}
 	}
@@ -68,7 +82,7 @@ func GenTypes(api *spec.ApiSpec, destPath string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile( requestDir+"/types.go", []byte("package types\n\n"+typesContent), os.ModePerm)
+	err = ioutil.WriteFile(requestDir+"/types.go", []byte("package types\n\n"+typesContent), os.ModePerm)
 	return nil
 }
 
@@ -93,7 +107,7 @@ func GenRoutes(api *spec.ApiSpec, projectName, destPath string) error {
 
 		router += "\n\t{\n"
 		for _, v := range r.Routes {
-			router += fmt.Sprintf("\t\t%sRouter.%s(\"%s\", v1.%s)\n", routerName, strings.ToUpper(v.Method), v.Path[1:], v.Handler)
+			router += fmt.Sprintf("\t\t%sRouter.%s(\"%s\", v1.%s)\n", routerName, strings.ToUpper(v.Method), v.Path[1:], ucFirst(v.Handler))
 		}
 		router += "\t}\n\n"
 		routerContent += router
@@ -112,4 +126,8 @@ func GenRoutes(api *spec.ApiSpec, projectName, destPath string) error {
 
 func dealVersion(version string) string {
 	return strings.ReplaceAll(version, "\"", "")
+}
+
+func ucFirst(str string) string {
+	return strings.ToUpper(str[0:1]) + str[1:]
 }
