@@ -3,6 +3,8 @@ package ipSearch
 import (
 	"io/ioutil"
 	"log"
+	"path"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -48,7 +50,7 @@ func loadIpDat() (*ipSearch, error) {
 
 	p := ipSearch{}
 	//加载ip地址库信息
-	data, err := ioutil.ReadFile("./utils/ipSearch/qqzeng-ip-utf8.dat")
+	data, err := ioutil.ReadFile(getCurrentPath() + "/qqzeng-ip-utf8.dat")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,6 +108,15 @@ func (p ipSearch) Get(ip string) string {
 	} else {
 		return ""
 	}
+}
+
+func getCurrentPath() string {
+	var abPath string
+	_, filename, _, ok := runtime.Caller(0)
+	if ok {
+		abPath = path.Dir(filename)
+	}
+	return abPath + "/"
 }
 
 // 二分逼近算法
