@@ -54,6 +54,7 @@ func loadIpDat() (*ipSearch, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	p.data = data
 	p.prefixMap = make(map[uint32]prefixIndex)
 
