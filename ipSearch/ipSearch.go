@@ -50,7 +50,7 @@ func loadIpDat() (*ipSearch, error) {
 
 	p := ipSearch{}
 	//加载ip地址库信息
-	data, err := ioutil.ReadFile(getCurrentPath() + "/qqzeng-ip-utf8.dat")
+	data, err := ioutil.ReadFile(getCurrentPath() + "qqzeng-ip-utf8.dat")
 	if err != nil {
 		log.Fatal(err)
 	}
