@@ -18,6 +18,34 @@ const (
 	StaticDomain = "https://static-pro.guangdianyun.tv"
 )
 
+func Upload(base64 string, uin int, module string, isComplete bool) (string, bool, error)  {
+	urlx := OssDomain + uploadUrl + "?authKey=" + AuthKey
+	res, _ := utils.Request(urlx, map[string]interface{}{
+		"content" : base64,
+		"uin" : uin,
+		"module" : module,
+	}, map[string]interface{}{}, "POST", "json")
+	var result struct{
+		Code int `json:"code"`
+		ErrorCode int `json:"errorCode"`
+		ErrorMessage string `json:"errorMessage"`
+		Data struct{
+			ShortPath string `json:"shortPath"`
+			CompletePath string `json:"completePath"`
+		} `json:"data"`
+	}
+
+	json.Unmarshal(res, &result)
+	if result.Code != 200 || result.ErrorCode != 0 {
+		return "", true, errors.New(result.ErrorMessage)
+	}
+	path := result.Data.ShortPath
+	if isComplete == true {
+		path = result.Data.CompletePath
+	}
+	return path, true, nil
+}
+
 func Copy(tempUrl string, uin int, module string, isComplete bool) (string, bool, error)  {
 	tempData := strings.Split(tempUrl, "?")
 	tempUrl = tempData[0]
