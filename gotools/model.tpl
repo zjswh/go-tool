@@ -17,3 +17,20 @@ func (m *Template) GetInfo(Db *gorm.DB) error {
     err := sql.First(&m).Error
     return err
 }
+
+func GetTemplateList(Db *gorm.DB, page, num int) ([]Template, error) {
+    var list []Template
+    sql := Db.Model(Template{})
+    if page > 0 && num > 0 {
+    sql = sql.Limit(num).Offset((page - 1) * num)
+    }
+    err := sql.Order("id desc").Find(&list).Error
+    return list, err
+}
+
+func GetTemplateCount(Db *gorm.DB) (int64, error) {
+    var count int64
+    sql := Db.Model(Template{})
+    err := sql.Count(&count).Error
+    return count, err
+}
