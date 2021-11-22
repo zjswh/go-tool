@@ -1,10 +1,7 @@
 package response
 
 import (
-	"TEMPLATE/config"
-	"TEMPLATE/types/appConst"
 	"github.com/gin-gonic/gin"
-	"github.com/zjswh/go-tool/logOperation"
 	"net/http"
 )
 
@@ -26,7 +23,6 @@ func Result(code int, data interface{}, msg string, c *gin.Context) {
 		msg,
 		code,
 	}
-	go logOperation.Push(c, config.GVA_CONFIG.Param.XCaStage, appConst.ApiMap, result)
 	c.JSON(http.StatusOK, result)
 }
 

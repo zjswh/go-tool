@@ -2,8 +2,7 @@ package gen
 
 
 var (
-	routerTemplate = `
-package router
+	routerTemplate = `package router
 
 import (
 	"github.com/gin-gonic/gin"
@@ -60,4 +59,21 @@ func FUNC_NAME(PARAM_TEMP) error {
 	return nil
 }
 `
+
+	middlewareTemplate = `package middleware
+
+import (
+	"github.com/gin-gonic/gin"
+)
+FUNC_LIST
+`
+
+	middlewareFuncTemplate = `
+func FUNC_NAME() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//edit your code...
+		
+		c.Next()
+	}
+}`
 )

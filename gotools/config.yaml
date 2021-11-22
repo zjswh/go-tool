@@ -1,0 +1,33 @@
+mysql:
+  username: "root"
+  password: "123456"
+  path: "127.0.0.1:3306"
+  db-name: "gdy_public"
+  config: "charset=utf8&parseTime=True&loc=Local"
+  max-idle-conns: 20
+  max-open-conns: 20
+  log-mode: false
+
+redis:
+  addr: '127.0.0.1:6379'
+  password: '123456'
+  db: 0
+
+system:
+  env: 'public'
+  addr: 8002
+  db-type: "mysql
+
+jwt:
+  signing-key: "project"
+
+Log:
+  path: "logs"
+  name: "system.log"
+
+email:
+  host: ""
+  port: 465
+  user: ""
+  pass: ""
+  admin-user: ""

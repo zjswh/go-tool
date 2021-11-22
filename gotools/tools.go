@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/logrusorgru/aurora"
-	"github.com/tal-tech/go-zero/tools/goctl/api/parser"
 	"github.com/urfave/cli"
+	"github.com/zjswh/go-tool/gotools/apiparser"
 	"github.com/zjswh/go-tool/gotools/gen"
 	"io/ioutil"
 	"net/http"
@@ -99,23 +99,24 @@ func template(c *cli.Context) {
 }
 
 func ApiCommand (apiFile, projectName, destPath string) error {
-	api, err := parser.Parse(apiFile)
+	parser := apiparser.NewParser()
+	err := parser.Parse(apiFile)
 	if err != nil {
 		return err
 	}
-	err = gen.GenRoutes(api, projectName, destPath)
+	err = gen.GenRoutes(parser.Service, projectName, destPath)
 	if err != nil {
 		return err
 	}
-	err = gen.GenApi(api, projectName, destPath)
+	err = gen.GenApi(parser.Service, projectName, destPath)
 	if err != nil {
 		return err
 	}
-	err = gen.GenTypes(api, destPath)
+	err = gen.GenTypes(parser.Types, destPath)
 	if err != nil {
 		return err
 	}
-	err = gen.GenService(api, projectName, destPath)
+	err = gen.GenService(parser.Service, projectName, destPath)
 	if err != nil {
 		return err
 	}
